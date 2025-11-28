@@ -233,7 +233,11 @@
 
             document.addEventListener("DOMContentLoaded", function(event) { 
                const urlParams = new URLSearchParams(window.location.search);
-               const remoteUrl = urlParams.get('remote-url');
+               let remoteUrl = urlParams.get('remote-url');
+
+               if (window.location.hash) {
+                  remoteUrl = window.location.hash.substring(1);
+               }
 
                if (remoteUrl) {
                   console.log("Loading file from", remoteUrl);
