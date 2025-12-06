@@ -1,16 +1,22 @@
 var structureLitematic;
 
 function loadAndProcessFile(file) {
-   
-   if (deepslateResources == null) {return;}
+
+   if (deepslateResources == null) { return; }
+
+   // Hide spinner if visible
+   const spinner = document.getElementById('loading-spinner');
+   if (spinner) spinner.hidden = true;
 
    // Remove input form to stop people submitting twice
    const elem = document.getElementById('file-loader-panel');
-   elem.parentNode.removeChild(elem);
-      
+   if (elem && elem.parentNode) {
+      elem.parentNode.removeChild(elem);
+   }
+
    let reader = new FileReader();
    reader.readAsArrayBuffer(file);
-   reader.onload = function(evt) {
+   reader.onload = function (evt) {
 
       //var buffer = new Uint8Array(reader.result);
       //console.log(buffer);
@@ -19,7 +25,7 @@ function loadAndProcessFile(file) {
       console.log("Loaded litematic with NBT data:")
       console.log(nbtdata.value);
       structureLitematic = readLitematicFromNBTData(nbtdata);
-      
+
       createRenderCanvas();
 
       //Create sliders
@@ -29,23 +35,23 @@ function loadAndProcessFile(file) {
       const blockCounts = getMaterialList(structureLitematic);
       createMaterialsList(blockCounts);
 
-      setStructure(structureFromLitematic(structureLitematic), reset_view=true);
+      setStructure(structureFromLitematic(structureLitematic), reset_view = true);
 
    };
-   reader.onerror = function() {
+   reader.onerror = function () {
       console.log(reader.error);
    };
-   
+
 }
 
 function createMaterialsList(blockCounts) {
    const materialList = document.getElementById('materialList');
 
    materialList.innerHTML = Object.entries(blockCounts)
-    .sort(([,a], [,b]) => b - a)
-    .map(([key, val]) => `<div class="count-item"><span>${key.replace('minecraft:', '')}</span><span>${val}</span></div>`)
-    //.map(([key, val]) => `<tr><td>${key}</td><td>${val}</td></tr>`)
-    .join('');
+      .sort(([, a], [, b]) => b - a)
+      .map(([key, val]) => `<div class="count-item"><span>${key.replace('minecraft:', '')}</span><span>${val}</span></div>`)
+      //.map(([key, val]) => `<tr><td>${key}</td><td>${val}</td></tr>`)
+      .join('');
    materialList.style.display = 'none';
 
    const materialListButton = document.getElementById('materialListButton');
@@ -57,17 +63,17 @@ function createMaterialsList(blockCounts) {
 
    function downloadMaterialsCSV() {
       const csvContent = Object.entries(blockCounts)
-      .sort(([,a], [,b]) => b - a)
-      .map(([key, val]) => `${key},${val}`)
-      .join('\n');
+         .sort(([, a], [, b]) => b - a)
+         .map(([key, val]) => `${key},${val}`)
+         .join('\n');
 
-       const blob = new Blob([csvContent], { type: 'text/csv' });
-       const url = window.URL.createObjectURL(blob);
-       const a = document.createElement('a');
-       a.href = url;
-       a.download = 'MaterialList.csv';
-       a.click();
-       window.URL.revokeObjectURL(url);
+      const blob = new Blob([csvContent], { type: 'text/csv' });
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'MaterialList.csv';
+      a.click();
+      window.URL.revokeObjectURL(url);
    }
 
    // Add download button
@@ -96,22 +102,22 @@ function createRangeSliders(max_y) {
    maxSlider.id = 'maxy';
    maxSlider.min = 0;
    maxSlider.max = max_y;
-   maxSlider.value = max_y-1;
+   maxSlider.value = max_y - 1;
    maxSlider.step = 1;
 
    var y_min = 0;
    var y_max = max_y;
 
-   minSlider.addEventListener('change', function(e) {
+   minSlider.addEventListener('change', function (e) {
       y_min = e.target.value;
       console.log(y_min);
-      setStructure(structureFromLitematic(structureLitematic, y_min=y_min, y_max=y_max));
+      setStructure(structureFromLitematic(structureLitematic, y_min = y_min, y_max = y_max));
    });
 
-   maxSlider.addEventListener('change', function(e) {
+   maxSlider.addEventListener('change', function (e) {
       y_max = e.target.value;
       console.log(y_max);
-      setStructure(structureFromLitematic(structureLitematic, y_min=y_min, y_max=y_max));
+      setStructure(structureFromLitematic(structureLitematic, y_min = y_min, y_max = y_max));
    });
 
    slidersDiv.appendChild(minSlider);
