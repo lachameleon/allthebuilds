@@ -14,9 +14,15 @@ function loadAndProcessFile(file) {
       elem.parentNode.removeChild(elem);
    }
 
+   // Update status text
+   const statusText = document.getElementById('loading-status');
+   if (statusText) statusText.innerText = "Reading file...";
+
    let reader = new FileReader();
    reader.readAsArrayBuffer(file);
    reader.onload = function (evt) {
+
+      if (statusText) statusText.innerText = "Processing schematic...";
 
       //var buffer = new Uint8Array(reader.result);
       //console.log(buffer);

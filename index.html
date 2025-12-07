@@ -162,6 +162,19 @@
 
 <body>
 
+   <nav style="background-color: rgba(0,0,0,0.5); position: fixed; top: 0; z-index: 100;">
+      <div class="nav-wrapper">
+         <a href="#" class="brand-logo left"
+            style="height: 100%; display: flex; align-items: center; padding-left: 10px;">
+            <img src="resource/ALL.gif" alt="Logo" style="max-height: 50px;">
+         </a>
+         <ul id="nav-mobile" class="right">
+            <li><a href="https://discord.gg/C2dHwBb3k3" target="_blank"><i class="fab fa-discord"
+                     style="font-size: 24px;"></i></a></li>
+         </ul>
+      </div>
+   </nav>
+
    <div id="viewer" width="100%"></div>
 
    <div id="sliders" hidden></div>
@@ -171,6 +184,7 @@
    <div id="loading-spinner" class="center" hidden
       style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 10;">
       <img id="loading-gif" src="resource/ALL.gif" alt="Loading..." style="max-width: 200px; height: auto;">
+      <div id="loading-status" style="color: grey; margin-top: 10px; font-family: monospace;"></div>
    </div>
 
    <div id="main-content">
@@ -290,6 +304,10 @@
          }
 
          function readFileURL(url, useProxy = true) {
+            // Update status text
+            const statusText = document.getElementById('loading-status');
+            if (statusText) statusText.innerText = "Downloading schematic...";
+
             // TODO: This URL probably shouldn't be hardcoded
             var proxyUrl = 'https://api.allorigins.win/raw?url=' + encodeURIComponent(url);
             var request = new XMLHttpRequest();
@@ -304,6 +322,7 @@
                   else {
                      console.log("Error loading litematic");
                      console.log(request);
+                     if (statusText) statusText.innerText = "Error loading file!";
                   }
                }
             };
