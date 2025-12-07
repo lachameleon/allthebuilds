@@ -28,9 +28,7 @@ function loadAndProcessFile(file) {
 
       createRenderCanvas();
 
-      //Create sliders
-      const max_y = structureLitematic.regions[0].blocks[0].length;
-      createRangeSliders(max_y);
+
 
       const blockCounts = getMaterialList(structureLitematic);
       createMaterialsList(blockCounts);
