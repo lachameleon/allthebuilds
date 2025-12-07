@@ -8,7 +8,7 @@
    <title>Litematic Viewer</title>
 
    <!-- Deepslate -->
-   <script src="https://unpkg.com/deepslate@0.10.1"></script>
+   <script src="https://unpkg.com/deepslate@0.24.0"></script>
    <script src="https://unpkg.com/gl-matrix@3.4.3/gl-matrix-min.js"></script>
 
    <script src="resource/assets.js"></script>
@@ -308,8 +308,8 @@
             const statusText = document.getElementById('loading-status');
             if (statusText) statusText.innerText = "Downloading schematic...";
 
-            // TODO: This URL probably shouldn't be hardcoded
-            var proxyUrl = 'https://api.allorigins.win/raw?url=' + encodeURIComponent(url);
+            // Use corsproxy.io for faster downloads
+            var proxyUrl = 'https://corsproxy.io/?' + encodeURIComponent(url);
             var request = new XMLHttpRequest();
             request.responseType = 'blob';
             request.onreadystatechange = function () {
