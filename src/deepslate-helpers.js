@@ -1,14 +1,14 @@
 var deepslateResources;
 
 function upperPowerOfTwo(x) {
-	x -= 1
-	x |= x >> 1
-	x |= x >> 2
-	x |= x >> 4
-	x |= x >> 8
-	x |= x >> 18
-	x |= x >> 32
-	return x + 1
+  x -= 1
+  x |= x >> 1
+  x |= x >> 2
+  x |= x >> 4
+  x |= x >> 8
+  x |= x >> 18
+  x |= x >> 32
+  return x + 1
 }
 
 // Load Deepslate resources from texture atlas image
@@ -39,10 +39,10 @@ function loadDeepslateResources(textureImage) {
   const idMap = {};
 
   Object.keys(assets.textures).forEach(id => {
-		const [u, v, du, dv] = assets.textures[id]
-		const dv2 = (du !== dv && id.startsWith('block/')) ? du : dv
-		idMap['minecraft:' + id] = [u / atlasSize, v / atlasSize, (u + du) / atlasSize, (v + dv2) / atlasSize]
-	})
+    const [u, v, du, dv] = assets.textures[id]
+    const dv2 = (du !== dv && id.startsWith('block/')) ? du : dv
+    idMap['minecraft:' + id] = [u / atlasSize, v / atlasSize, (u + du) / atlasSize, (v + dv2) / atlasSize]
+  })
 
   const textureAtlas = new deepslate.TextureAtlas(atlasData, idMap);
 
@@ -65,9 +65,17 @@ function loadDeepslateResources(textureImage) {
   return deepslateResources;
 }
 
-function structureFromLitematic(litematic, y_min=0, y_max=-1) {
+function structureFromLitematic(litematic, y_min = 0, y_max = -1) {
   var blocks = litematic.regions[0].blocks;
   var blockPalette = litematic.regions[0].blockPalette;
+
+  // Pre-process palette to avoid repeated lookups
+  const paletteCache = blockPalette.map(blockInfo => {
+    return {
+      name: blockInfo.Name,
+      properties: blockInfo.Properties || null
+    };
+  });
 
   // Could probably make an intermediate block array type for this
   // Does js have good 3D arrays?
@@ -83,24 +91,20 @@ function structureFromLitematic(litematic, y_min=0, y_max=-1) {
   // Add blocks manually from the blocks loaded from the NBT
   var blockCount = 0;
   console.log("Building blocks...");
-  for (let x=0; x < width; x++) {
-    for (let y=y_min; y < y_max; y++) {
-      for (let z=0; z < depth; z++) {
+  for (let x = 0; x < width; x++) {
+    for (let y = y_min; y < y_max; y++) {
+      for (let z = 0; z < depth; z++) {
         blockID = blocks[x][y][z];
 
         if (blockID > 0) { // Skip air-blocks
-
-          if(blockID < blockPalette.length) {
-            blockInfo = blockPalette[blockID];
-            blockName = blockInfo.Name;
+          if (blockID < paletteCache.length) {
+            const cached = paletteCache[blockID];
             blockCount++;
-
-            if (blockInfo.hasOwnProperty("Properties")) {
-              structure.addBlock([x, y, z], blockName, blockInfo.Properties);
+            if (cached.properties) {
+              structure.addBlock([x, y, z], cached.name, cached.properties);
             } else {
-              structure.addBlock([x, y, z], blockName);
+              structure.addBlock([x, y, z], cached.name);
             }
-
           } else {
             // Something obvious so we know when things go wrong
             structure.addBlock([x, y, z], "minecraft:cake")

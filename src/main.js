@@ -24,24 +24,31 @@ function loadAndProcessFile(file) {
 
       if (statusText) statusText.innerText = "Processing schematic...";
 
-      //var buffer = new Uint8Array(reader.result);
-      //console.log(buffer);
+      // Allow UI to update before heavy processing
+      setTimeout(() => {
+         const nbtdata = deepslate.readNbt(new Uint8Array(reader.result));
+         console.log("Loaded litematic with NBT data:")
+         console.log(nbtdata.value);
+         structureLitematic = readLitematicFromNBTData(nbtdata);
 
-      const nbtdata = deepslate.readNbt(new Uint8Array(reader.result));//.result; // Don't care about .compressed
-      console.log("Loaded litematic with NBT data:")
-      console.log(nbtdata.value);
-      structureLitematic = readLitematicFromNBTData(nbtdata);
+         createRenderCanvas();
 
-      createRenderCanvas();
+         //Create sliders
+         const max_y = structureLitematic.regions[0].blocks[0].length;
+         createRangeSliders(max_y);
 
-      //Create sliders
-      const max_y = structureLitematic.regions[0].blocks[0].length;
-      createRangeSliders(max_y);
+         const blockCounts = getMaterialList(structureLitematic);
+         createMaterialsList(blockCounts);
 
-      const blockCounts = getMaterialList(structureLitematic);
-      createMaterialsList(blockCounts);
+         if (statusText) statusText.innerText = "Rendering...";
 
-      setStructure(structureFromLitematic(structureLitematic), reset_view = true);
+         // Allow UI to update before rendering
+         setTimeout(() => {
+            setStructure(structureFromLitematic(structureLitematic), reset_view = true);
+            if (statusText) statusText.innerText = "";
+         }, 10);
+
+      }, 10);
 
    };
    reader.onerror = function () {
