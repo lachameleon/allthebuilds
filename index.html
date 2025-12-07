@@ -303,23 +303,40 @@
          }
 
          function readFileURL(url, useProxy = true) {
+            console.log("Attempting to load URL:", url);
             // TODO: This URL probably shouldn't be hardcoded
             var proxyUrl = 'https://api.allorigins.win/raw?url=' + encodeURIComponent(url);
+            console.log("Using proxy URL:", proxyUrl);
+
             var request = new XMLHttpRequest();
             request.responseType = 'blob';
+            request.timeout = 30000; // 30 seconds timeout
+
             request.onreadystatechange = function () {
                if (request.readyState == XMLHttpRequest.DONE) {
                   if (request.status === 200) {
-                     console.log("Loaded file from remote url");
-                     console.log(request.response);
+                     console.log("Loaded file from remote url successfully");
+                     console.log("Response size:", request.response.size);
                      loadAndProcessFile(request.response);
                   }
                   else {
-                     console.log("Error loading litematic");
-                     console.log(request);
+                     console.error("Error loading litematic. Status:", request.status, "Status Text:", request.statusText);
+                     console.log("Response:", request.response);
+                     alert("Failed to load schematic. Please check the URL and try again.");
                   }
                }
             };
+
+            request.ontimeout = function () {
+               console.error("Request timed out");
+               alert("Connection timed out while trying to load the schematic.");
+            };
+
+            request.onerror = function () {
+               console.error("Network error occurred");
+               alert("A network error occurred while trying to load the schematic.");
+            };
+
             request.open('GET', proxyUrl, true);
             request.send();
          }

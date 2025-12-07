@@ -1,8 +1,13 @@
 var structureLitematic;
 
 function loadAndProcessFile(file) {
+   console.log("Processing file:", file.name || "blob");
 
-   if (deepslateResources == null) { return; }
+   if (deepslateResources == null) {
+      console.error("Deepslate resources not loaded yet!");
+      alert("Resources are still loading. Please wait a moment and try again.");
+      return;
+   }
 
    // Hide spinner if visible
    const spinner = document.getElementById('loading-spinner');
@@ -17,27 +22,35 @@ function loadAndProcessFile(file) {
    let reader = new FileReader();
    reader.readAsArrayBuffer(file);
    reader.onload = function (evt) {
+      console.log("File read successfully. Parsing NBT...");
+      try {
+         //var buffer = new Uint8Array(reader.result);
+         //console.log(buffer);
 
-      //var buffer = new Uint8Array(reader.result);
-      //console.log(buffer);
+         const nbtdata = deepslate.readNbt(new Uint8Array(reader.result));//.result; // Don't care about .compressed
+         console.log("Loaded litematic with NBT data:", nbtdata.value);
 
-      const nbtdata = deepslate.readNbt(new Uint8Array(reader.result));//.result; // Don't care about .compressed
-      console.log("Loaded litematic with NBT data:")
-      console.log(nbtdata.value);
-      structureLitematic = readLitematicFromNBTData(nbtdata);
+         structureLitematic = readLitematicFromNBTData(nbtdata);
+         console.log("Structure parsed. Creating render canvas...");
 
-      createRenderCanvas();
+         createRenderCanvas();
 
 
 
-      const blockCounts = getMaterialList(structureLitematic);
-      createMaterialsList(blockCounts);
+         const blockCounts = getMaterialList(structureLitematic);
+         createMaterialsList(blockCounts);
 
-      setStructure(structureFromLitematic(structureLitematic), reset_view = true);
-
+         console.log("Setting structure...");
+         setStructure(structureFromLitematic(structureLitematic), reset_view = true);
+         console.log("Structure set.");
+      } catch (e) {
+         console.error("Error processing file:", e);
+         alert("Error processing the schematic file. It might be corrupted or invalid.");
+      }
    };
    reader.onerror = function () {
-      console.log(reader.error);
+      console.error("FileReader error:", reader.error);
+      alert("Error reading the file.");
    };
 
 }
