@@ -170,7 +170,7 @@
 
    <div id="loading-spinner" class="center" hidden
       style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 10;">
-      <img src="resource/ALL.gif" alt="Loading..." style="max-width: 200px; height: auto;">
+      <img id="loading-gif" src="resource/ALL.gif" alt="Loading..." style="max-width: 200px; height: auto;">
    </div>
 
    <div id="main-content">
@@ -265,11 +265,30 @@
 
                // Show spinner
                const spinner = document.getElementById('loading-spinner');
-               if (spinner) spinner.hidden = false;
+               if (spinner) {
+                  spinner.hidden = false;
+                  animateLoader();
+               }
 
                readFileURL(remoteUrl);
             }
          });
+
+         function animateLoader() {
+            const img = document.getElementById('loading-gif');
+            const spinner = document.getElementById('loading-spinner');
+
+            // Stop if spinner is hidden or elements missing
+            if (!img || !spinner || spinner.hidden) return;
+
+            // Restart gif by updating src with timestamp
+            img.src = "resource/ALL.gif?t=" + new Date().getTime();
+
+            const gifDuration = 3000; // 3 seconds
+            const pauseDuration = 1000; // 1 second
+
+            setTimeout(animateLoader, gifDuration + pauseDuration);
+         }
 
          function readFileInput(input) {
             for (let i = 0; i < input.files.length; i++) {
